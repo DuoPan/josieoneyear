@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type TimelineItem = {
   month: number;
   title: string;
   description: string;
-  photos: string[];
+  media: string[];
 };
 
 type PetalOffset = {
@@ -17,7 +17,7 @@ type PetalOffset = {
   r: number;
 };
 
-const basePhotos = [
+const baseMedia = [
   "/baby-photos/placeholder-1.svg",
   "/baby-photos/placeholder-2.svg",
   "/baby-photos/placeholder-3.svg",
@@ -25,12 +25,29 @@ const basePhotos = [
   "/baby-photos/placeholder-2.svg"
 ];
 
-const items: TimelineItem[] = Array.from({ length: 12 }, (_, i) => ({
-  month: i + 1,
-  title: `第 ${i + 1} 月`,
-  description: "长高一点、会笑更甜，记录这个月的小小成长。",
-  photos: basePhotos
-}));
+const firstMonthMedia = [
+  "/baby-photos/1.1.mp4",
+  "/baby-photos/1.2.webp",
+  "/baby-photos/1.3.webp",
+  "/baby-photos/1.4.webp",
+  "/baby-photos/1.5.webp"
+];
+
+const items: TimelineItem[] = Array.from({ length: 12 }, (_, i) => {
+  const month = i + 1;
+  return {
+    month,
+    title: `第 ${month} 月`,
+    description: "睁眼看世界,是谁在摇晃。",
+    media: month === 1 ? firstMonthMedia : baseMedia
+  };
+});
+const INITIAL_VISIBLE_MONTHS = 4;
+const MONTHS_PER_BATCH = 4;
+
+function isVideoSrc(src: string) {
+  return /\.(mp4|webm|mov)$/i.test(src);
+}
 
 function seededRandom(seed: number) {
   let value = seed % 2147483647;
@@ -66,20 +83,20 @@ function buildMonthPetalLayout(month: number, petalCount: number): PetalOffset[]
 }
 
 function TimelinePhotoBloom({
-  photos,
+  media,
   active,
   layout,
   onPhotoClick
 }: {
-  photos: string[];
+  media: string[];
   active: boolean;
   layout: PetalOffset[];
   onPhotoClick: (photoIndex: number) => void;
 }) {
   const petals = useMemo(() => {
-    const sources = photos.slice(1);
+    const sources = media.slice(1);
     return layout.map((_, idx) => sources[idx % sources.length]);
-  }, [layout, photos]);
+  }, [layout, media]);
 
   return (
     <div className="relative mx-auto h-60 w-full max-w-[22rem] md:h-64 md:w-64 md:max-w-none">
@@ -112,7 +129,13 @@ function TimelinePhotoBloom({
             }}
             aria-label={`查看第 ${idx + 2} 张照片`}
           >
-            <Image src={src} alt="成长照片" fill sizes="(min-width: 768px) 144px, 96px" className="object-cover" />
+            {isVideoSrc(src) ? (
+              <video className="h-full w-full object-cover" muted loop autoPlay playsInline preload="metadata">
+                <source src={src} />
+              </video>
+            ) : (
+              <Image src={src} alt="成长照片" fill sizes="(min-width: 768px) 144px, 96px" className="object-cover" />
+            )}
           </button>
         </motion.div>
       ))}
@@ -131,7 +154,13 @@ function TimelinePhotoBloom({
           }}
           aria-label="查看主照片"
         >
-          <Image src={photos[0]} alt="主成长照片" fill sizes="(min-width: 768px) 160px, 92vw" className="object-cover" />
+          {isVideoSrc(media[0]) ? (
+            <video className="h-full w-full object-cover" muted loop autoPlay playsInline preload="metadata">
+              <source src={media[0]} />
+            </video>
+          ) : (
+            <Image src={media[0]} alt="主成长照片" fill sizes="(min-width: 768px) 160px, 92vw" className="object-cover" />
+          )}
         </button>
       </motion.div>
     </div>
@@ -140,33 +169,60 @@ function TimelinePhotoBloom({
 
 type ModalState = {
   month: number;
-  photos: string[];
+  media: string[];
   activeIndex: number;
 };
 
 export function Timeline() {
   const [activeMonth, setActiveMonth] = useState<number | null>(null);
   const [modal, setModal] = useState<ModalState | null>(null);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_MONTHS);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const visibleItems = useMemo(() => items.slice(0, visibleCount), [visibleCount]);
   const monthLayouts = useMemo(
     () =>
       Object.fromEntries(
-        items.map((item) => [item.month, buildMonthPetalLayout(item.month, item.photos.length - 1)])
+        items.map((item) => [item.month, buildMonthPetalLayout(item.month, item.media.length - 1)])
       ) as Record<number, PetalOffset[]>,
     []
   );
 
-  function openModal(month: number, photos: string[], activeIndex: number) {
-    setModal({ month, photos, activeIndex });
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target) return;
+    if (visibleCount >= items.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (!entry.isIntersecting) return;
+        setVisibleCount((prev) => Math.min(prev + MONTHS_PER_BATCH, items.length));
+      },
+      { rootMargin: "200px 0px" }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [visibleCount]);
+
+  function openModal(month: number, media: string[], activeIndex: number) {
+    const firstVideoIndex = media.findIndex((item) => isVideoSrc(item));
+    const startIndex = firstVideoIndex >= 0 ? firstVideoIndex : activeIndex;
+    setModal({ month, media, activeIndex: startIndex });
+    setModalLoading(true);
   }
 
   function closeModal() {
     setModal(null);
+    setModalLoading(false);
   }
 
   function moveSlide(direction: 1 | -1) {
     setModal((prev) => {
       if (!prev) return prev;
-      const nextIndex = (prev.activeIndex + direction + prev.photos.length) % prev.photos.length;
+      const nextIndex = (prev.activeIndex + direction + prev.media.length) % prev.media.length;
+      setModalLoading(true);
       return { ...prev, activeIndex: nextIndex };
     });
   }
@@ -190,7 +246,7 @@ export function Timeline() {
           </svg>
 
           <div className="space-y-12 md:space-y-10">
-            {items.map((item, index) => {
+            {visibleItems.map((item, index) => {
               const isLeft = index % 2 === 0;
               const isActive = activeMonth === item.month;
 
@@ -206,10 +262,10 @@ export function Timeline() {
                   >
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                       <TimelinePhotoBloom
-                        photos={item.photos}
+                        media={item.media}
                         active={isActive}
                         layout={monthLayouts[item.month]}
-                        onPhotoClick={(photoIndex) => openModal(item.month, item.photos, photoIndex)}
+                        onPhotoClick={(photoIndex) => openModal(item.month, item.media, photoIndex)}
                       />
                       <div className="text-center sm:text-left">
                         <p className="text-sm font-semibold text-sky-600">Month {item.month}</p>
@@ -226,6 +282,7 @@ export function Timeline() {
                 </div>
               );
             })}
+            {visibleCount < items.length ? <div ref={loadMoreRef} className="h-10" aria-hidden /> : null}
           </div>
         </div>
       </section>
@@ -248,7 +305,7 @@ export function Timeline() {
             >
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-sm font-semibold text-sky-600">
-                  Month {modal.month} · {modal.activeIndex + 1} / {modal.photos.length}
+                  Month {modal.month} · {modal.activeIndex + 1} / {modal.media.length}
                 </p>
                 <button type="button" className="rounded-full border border-slate-200 px-3 py-1 text-sm text-slate-600" onClick={closeModal}>
                   关闭
@@ -256,14 +313,32 @@ export function Timeline() {
               </div>
 
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-slate-100">
-                <Image
-                  src={modal.photos[modal.activeIndex]}
-                  alt={`第 ${modal.activeIndex + 1} 张照片`}
-                  fill
-                  sizes="(min-width: 1024px) 900px, 100vw"
-                  className="object-cover"
-                  priority
-                />
+                {modalLoading ? (
+                  <div className="absolute inset-0 z-10 grid place-items-center bg-white/60 backdrop-blur-[1px]">
+                    <div className="h-9 w-9 animate-spin rounded-full border-4 border-partyBlue/30 border-t-partyPink" />
+                  </div>
+                ) : null}
+                {isVideoSrc(modal.media[modal.activeIndex]) ? (
+                  <video
+                    className="h-full w-full object-cover"
+                    controls
+                    autoPlay
+                    playsInline
+                    preload="metadata"
+                    onCanPlay={() => setModalLoading(false)}
+                  >
+                    <source src={modal.media[modal.activeIndex]} />
+                  </video>
+                ) : (
+                  <Image
+                    src={modal.media[modal.activeIndex]}
+                    alt={`第 ${modal.activeIndex + 1} 张照片`}
+                    fill
+                    sizes="(min-width: 1024px) 900px, 100vw"
+                    className="object-cover"
+                    onLoadingComplete={() => setModalLoading(false)}
+                  />
+                )}
               </div>
 
               <div className="mt-4 flex items-center justify-center gap-3">

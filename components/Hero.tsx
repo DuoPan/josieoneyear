@@ -65,13 +65,18 @@ export function Hero() {
           <div className="aspect-square rounded-[1.5rem] bg-[radial-gradient(circle_at_30%_20%,#fff_0,#ffe9f0_45%,#b7dcff_100%)] p-4 shadow-inner">
             <div className="relative h-full overflow-visible rounded-[1.2rem] border border-white/60 bg-white/60">
               <div className="h-full overflow-hidden rounded-[1.2rem]">
-                <Image
-                  src="/1.gif"
-                  alt="Josie 可爱动图"
-                  width={640}
-                  height={640}
+                <video
                   className="h-full w-full object-cover object-[58%_50%] md:object-center"
-                />
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  poster="/1.gif"
+                >
+                  <source src="/1.webm" type="video/webm" />
+                  <source src="/1.mp4" type="video/mp4" />
+                </video>
               </div>
               <div aria-hidden className="absolute bottom-[-2rem] right-[-1.1rem] rotate-[-14deg] drop-shadow-[0_10px_18px_rgba(0,0,0,0.3)] md:bottom-[-2.2rem] md:right-[-1.8rem]">
                 <Image src="/icons/firecracker.svg" alt="" width={120} height={120} className="h-[5.6rem] w-[5.6rem] md:h-[6.6rem] md:w-[6.6rem]" />

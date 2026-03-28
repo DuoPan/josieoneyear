@@ -33,13 +33,37 @@ const firstMonthMedia = [
   "/baby-photos/1.5.webp"
 ];
 
+const secondMonthMedia = [
+  "/baby-photos/2.1.mp4",
+  "/baby-photos/2.2.webp",
+  "/baby-photos/2.3.webp",
+  "/baby-photos/2.4.webp",
+  "/baby-photos/2.5.webp"
+];
+
+const monthDescriptions = [
+  "这个摇晃的世界，让我睁眼看看。",
+  "教育从娃娃抓起，抬头锻炼也不能少，沾地就睡。",
+  "小手开始抓握，最爱摸摸小玩具。",
+  "趴着抬头更稳，探索欲越来越强。",
+  "翻身动作更熟练，成长速度惊人。",
+  "咿呀学语进行中，开始和我们“聊天”。",
+  "坐姿更稳定，好奇地观察身边一切。",
+  "会主动伸手要抱抱，黏人又可爱。",
+  "扶站练习中，勇敢迈出小步子。",
+  "笑声更洪亮，爱和大家一起玩。",
+  "听懂更多指令，互动感明显提升。",
+  "一岁到啦，成长每一刻都值得纪念。"
+];
+
 const items: TimelineItem[] = Array.from({ length: 12 }, (_, i) => {
   const month = i + 1;
+  const media = month === 1 ? firstMonthMedia : month === 2 ? secondMonthMedia : baseMedia;
   return {
     month,
     title: `第 ${month} 月`,
-    description: "睁眼看世界,是谁在摇晃。",
-    media: month === 1 ? firstMonthMedia : baseMedia
+    description: monthDescriptions[i],
+    media
   };
 });
 const INITIAL_VISIBLE_MONTHS = 4;
@@ -205,6 +229,21 @@ export function Timeline() {
     observer.observe(target);
     return () => observer.disconnect();
   }, [visibleCount]);
+
+  useEffect(() => {
+    if (!modal) return;
+    if (!isVideoSrc(modal.media[modal.activeIndex])) return;
+
+    const imageSources = modal.media.filter((src, index) => index !== modal.activeIndex && !isVideoSrc(src));
+    if (imageSources.length === 0) return;
+
+    // When current slide is video, warm up sibling images for fast switching.
+    imageSources.forEach((src) => {
+      const img = new window.Image();
+      img.decoding = "async";
+      img.src = src;
+    });
+  }, [modal]);
 
   function openModal(month: number, media: string[], activeIndex: number) {
     const firstVideoIndex = media.findIndex((item) => isVideoSrc(item));

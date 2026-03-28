@@ -8,7 +8,7 @@ type TimelineItem = {
   month: number;
   title: string;
   description: string;
-  media: string[];
+  media: [string];
 };
 
 type PetalOffset = {
@@ -17,48 +17,57 @@ type PetalOffset = {
   r: number;
 };
 
-const baseMedia = [
-  "/baby-photos/placeholder-1.svg",
-  "/baby-photos/placeholder-2.svg",
-  "/baby-photos/placeholder-3.svg",
-  "/baby-photos/placeholder-1.svg",
-  "/baby-photos/placeholder-2.svg"
-];
-
-const firstMonthMedia = [
-  "/baby-photos/1.1.mp4",
-  "/baby-photos/1.2.webp",
-  "/baby-photos/1.3.webp",
-  "/baby-photos/1.4.webp",
-  "/baby-photos/1.5.webp"
-];
-
-const secondMonthMedia = [
-  "/baby-photos/2.1.mp4",
-  "/baby-photos/2.2.webp",
-  "/baby-photos/2.3.webp",
-  "/baby-photos/2.4.webp",
-  "/baby-photos/2.5.webp"
-];
+const baseMedia: [string] = ["/baby-photos/placeholder-1.svg"];
+const firstMonthMedia: [string] = ["/baby-photos/1.1.mp4"];
+const secondMonthMedia: [string] = ["/baby-photos/2.1.mp4"];
+const thirdMonthMedia: [string] = ["/baby-photos/3.1.mp4"];
+const fourthMonthMedia: [string] = ["/baby-photos/4.1.mp4"];
+const fifthMonthMedia: [string] = ["/baby-photos/5.1.mp4"];
+const sixthMonthMedia: [string] = ["/baby-photos/6.1.mp4"];
+const seventhMonthMedia: [string] = ["/baby-photos/7.1.mp4"];
+const eighthMonthMedia: [string] = ["/baby-photos/8.1.mp4"];
+const ninthMonthMedia: [string] = ["/baby-photos/9.1.mp4"];
+const tenthMonthMedia: [string] = ["/baby-photos/10.1.mp4"];
 
 const monthDescriptions = [
-  "这个摇晃的世界，让我睁眼看看。",
-  "教育从娃娃抓起，抬头锻炼也不能少，沾地就睡。",
-  "小手开始抓握，最爱摸摸小玩具。",
-  "趴着抬头更稳，探索欲越来越强。",
-  "翻身动作更熟练，成长速度惊人。",
-  "咿呀学语进行中，开始和我们“聊天”。",
-  "坐姿更稳定，好奇地观察身边一切。",
-  "会主动伸手要抱抱，黏人又可爱。",
-  "扶站练习中，勇敢迈出小步子。",
-  "笑声更洪亮，爱和大家一起玩。",
-  "听懂更多指令，互动感明显提升。",
-  "一岁到啦，成长每一刻都值得纪念。"
+  "这是个摇晃的世界。。。",
+  "锻炼身体，努力抬头。",
+  "终于能看清爸妈了，露出了微笑。",
+  "前庭运动+哄娃神器，爱上了旋转和飞翔。",
+  "不仅能抬头，还能抗住两枚口水弹",
+  "初尝辅食，爱了爱了！",
+  "吃饱喝好，备战高考。",
+  "I人社交练习中。",
+  "电量扩容，可以出门吃饭了。",
+  "匍匐前进，向怀抱冲刺！",
+  "。",
+  "。"
 ];
 
 const items: TimelineItem[] = Array.from({ length: 12 }, (_, i) => {
   const month = i + 1;
-  const media = month === 1 ? firstMonthMedia : month === 2 ? secondMonthMedia : baseMedia;
+  const media =
+    month === 1
+      ? firstMonthMedia
+      : month === 2
+        ? secondMonthMedia
+        : month === 3
+          ? thirdMonthMedia
+          : month === 4
+            ? fourthMonthMedia
+            : month === 5
+              ? fifthMonthMedia
+              : month === 6
+                ? sixthMonthMedia
+                : month === 7
+                  ? seventhMonthMedia
+                  : month === 8
+                    ? eighthMonthMedia
+                    : month === 9
+                      ? ninthMonthMedia
+                      : month === 10
+                        ? tenthMonthMedia
+            : baseMedia;
   return {
     month,
     title: `第 ${month} 月`,
@@ -108,70 +117,27 @@ function buildMonthPetalLayout(month: number, petalCount: number): PetalOffset[]
 
 function TimelinePhotoBloom({
   media,
-  active,
-  layout,
   onPhotoClick
 }: {
   media: string[];
-  active: boolean;
-  layout: PetalOffset[];
   onPhotoClick: (photoIndex: number) => void;
 }) {
-  const petals = useMemo(() => {
-    const sources = media.slice(1);
-    return layout.map((_, idx) => sources[idx % sources.length]);
-  }, [layout, media]);
-
   return (
     <div className="relative mx-auto h-60 w-full max-w-[22rem] md:h-64 md:w-64 md:max-w-none">
+      {/* Blossom effect kept for future restore.
       <motion.div
         aria-hidden
         className="absolute left-1/2 top-1/2 h-36 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full bg-partyPink/25 blur-xl md:h-52 md:w-52"
         animate={{ opacity: active ? 0.95 : 0, scale: active ? 1.15 : 0.6 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
       />
+      ...petal media map block...
+      */}
 
-      {petals.map((src, idx) => (
-        <motion.div
-          key={`${src}-${idx}`}
-          className="absolute left-1/2 top-1/2 z-0 hidden md:block"
-          animate={{
-            x: active ? layout[idx].x : 0,
-            y: active ? layout[idx].y : 0,
-            rotate: active ? layout[idx].r : 0,
-            scale: active ? 1.08 : 0.28,
-            opacity: active ? 1 : 0
-          }}
-          transition={{ duration: 0.42, ease: "easeOut", delay: idx * 0.04 }}
-        >
-          <button
-            type="button"
-            className="relative h-24 w-24 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border-2 border-white bg-white shadow-md transition hover:scale-105 md:h-36 md:w-36"
-            onClick={(event) => {
-              event.stopPropagation();
-              onPhotoClick(idx + 1);
-            }}
-            aria-label={`查看第 ${idx + 2} 张照片`}
-          >
-            {isVideoSrc(src) ? (
-              <video className="h-full w-full object-cover" muted loop autoPlay playsInline preload="metadata">
-                <source src={src} />
-              </video>
-            ) : (
-              <Image src={src} alt="成长照片" fill sizes="(min-width: 768px) 144px, 96px" className="object-cover" />
-            )}
-          </button>
-        </motion.div>
-      ))}
-
-      <motion.div
-        className="absolute inset-0 z-10 flex items-center justify-center md:left-1/2 md:top-1/2 md:inset-auto"
-        animate={{ scale: active ? 1.2 : 1, rotate: active ? 2 : 0 }}
-        transition={{ duration: 0.28 }}
-      >
+      <div className="absolute inset-0 z-10 flex items-center justify-center">
         <button
           type="button"
-          className="relative h-52 w-[calc(100%-0.5rem)] appearance-none overflow-hidden rounded-2xl border-0 border-transparent bg-transparent p-0 shadow-none transition hover:scale-105 md:h-40 md:w-40 md:-translate-x-1/2 md:-translate-y-1/2 md:border-2 md:border-white md:bg-white md:shadow-lg"
+          className="relative h-52 w-[calc(100%-0.5rem)] appearance-none overflow-hidden rounded-2xl border-0 border-transparent bg-transparent p-0 shadow-none transition hover:scale-105 md:h-52 md:w-[calc(100%-0.5rem)]"
           onClick={(event) => {
             event.stopPropagation();
             onPhotoClick(0);
@@ -186,7 +152,7 @@ function TimelinePhotoBloom({
             <Image src={media[0]} alt="主成长照片" fill sizes="(min-width: 768px) 160px, 92vw" className="object-cover" />
           )}
         </button>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -204,13 +170,14 @@ export function Timeline() {
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_MONTHS);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const visibleItems = useMemo(() => items.slice(0, visibleCount), [visibleCount]);
-  const monthLayouts = useMemo(
-    () =>
-      Object.fromEntries(
-        items.map((item) => [item.month, buildMonthPetalLayout(item.month, item.media.length - 1)])
-      ) as Record<number, PetalOffset[]>,
-    []
-  );
+  // Blossom layout retained for future restore:
+  // const monthLayouts = useMemo(
+  //   () =>
+  //     Object.fromEntries(
+  //       items.map((item) => [item.month, buildMonthPetalLayout(item.month, item.media.length - 1)])
+  //     ) as Record<number, PetalOffset[]>,
+  //   []
+  // );
 
   useEffect(() => {
     const target = loadMoreRef.current;
@@ -287,7 +254,7 @@ export function Timeline() {
           <div className="space-y-12 md:space-y-10">
             {visibleItems.map((item, index) => {
               const isLeft = index % 2 === 0;
-              const isActive = activeMonth === item.month;
+              // const isActive = activeMonth === item.month;
 
               return (
                 <div
@@ -297,13 +264,11 @@ export function Timeline() {
                   onMouseLeave={() => setActiveMonth(null)}
                 >
                   <article
-                    className={`bg-transparent rounded-none md:bg-white/85 p-4 shadow-lg backdrop-blur transition md:rounded-3xl md:border ${isActive ? "shadow-glow" : ""} ${isLeft ? "md:col-start-1" : "md:col-start-3"}`}
+                    className={`bg-transparent rounded-none md:bg-white/85 p-4 shadow-lg backdrop-blur transition md:rounded-3xl md:border ${isLeft ? "md:col-start-1" : "md:col-start-3"}`}
                   >
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                       <TimelinePhotoBloom
                         media={item.media}
-                        active={isActive}
-                        layout={monthLayouts[item.month]}
                         onPhotoClick={(photoIndex) => openModal(item.month, item.media, photoIndex)}
                       />
                       <div className="text-center sm:text-left">

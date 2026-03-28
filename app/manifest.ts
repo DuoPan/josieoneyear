@@ -2,9 +2,9 @@
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "宝宝一岁生日邀请函",
+    name: "Josie一岁生日邀请函",
     short_name: "生日邀请",
-    description: "宝宝一岁生日派对邀请页",
+    description: "Josie一岁生日派对邀请页",
     start_url: "/",
     display: "standalone",
     background_color: "#fff7ec",

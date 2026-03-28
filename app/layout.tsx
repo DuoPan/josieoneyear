@@ -8,11 +8,11 @@ const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfa
 const poppins = Poppins({ subsets: ["latin"], weight: ["300", "400", "500", "700"], variable: "--font-poppins" });
 
 export const metadata: Metadata = {
-  title: "宝宝一岁生日邀请函",
-  description: "欢迎来参加宝宝一岁生日派对，期待和你一起庆祝。",
+  title: "Josie一岁生日邀请函",
+  description: "欢迎来参加Josie一岁生日派对，期待和您一起庆祝。",
   openGraph: {
-    title: "宝宝一岁生日邀请函",
-    description: "欢迎来参加宝宝一岁生日派对，期待和你一起庆祝。",
+    title: "Josie一岁生日邀请函",
+    description: "欢迎来参加Josie一岁生日派对，期待和您一起庆祝。",
     type: "website"
   }
 };

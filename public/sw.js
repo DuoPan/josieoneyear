@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = "birthday-invite-v1";
+const CACHE_NAME = "birthday-invite-v2";
 const OFFLINE_URL = "/offline";
 const PRECACHE_URLS = ["/", "/offline", "/manifest.webmanifest", "/icons/icon-192.svg", "/icons/icon-512.svg"];
 
@@ -21,11 +21,22 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
+  const url = new URL(event.request.url);
+  const isSameOrigin = url.origin === self.location.origin;
+  const destination = event.request.destination;
+  const isRangeRequest = event.request.headers.has("range");
+  const isMedia = destination === "video" || destination === "audio";
+
+  // Avoid proxying media/range requests through SW cache; embedded webviews are sensitive here.
+  if (!isSameOrigin || isRangeRequest || isMedia) return;
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        if (response.ok && response.type === "basic") {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
         return response;
       })
       .catch(async () => {

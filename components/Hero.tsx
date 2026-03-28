@@ -71,11 +71,15 @@ export function Hero() {
                   muted
                   loop
                   playsInline
+                  webkit-playsinline="true"
+                  x5-playsinline="true"
+                  x5-video-player-type="h5"
+                  x5-video-player-fullscreen="false"
                   preload="metadata"
-                  poster="/1.gif"
+                  poster="/baby-photos/placeholder-1.svg"
                 >
-                  <source src="/1.webm" type="video/webm" />
                   <source src="/1.mp4" type="video/mp4" />
+                  <source src="/1.webm" type="video/webm" />
                 </video>
               </div>
               <div aria-hidden className="absolute bottom-[-2rem] right-[-1.1rem] rotate-[-14deg] drop-shadow-[0_10px_18px_rgba(0,0,0,0.3)] md:bottom-[-2.2rem] md:right-[-1.8rem]">

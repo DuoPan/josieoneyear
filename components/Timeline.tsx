@@ -145,7 +145,19 @@ function TimelinePhotoBloom({
           aria-label="查看主照片"
         >
           {isVideoSrc(media[0]) ? (
-            <video className="h-full w-full object-cover" muted loop autoPlay playsInline preload="metadata">
+            <video
+              className="h-full w-full object-cover"
+              muted
+              loop
+              autoPlay
+              playsInline
+              webkit-playsinline="true"
+              x5-playsinline="true"
+              x5-video-player-type="h5"
+              x5-video-player-fullscreen="false"
+              preload="metadata"
+              poster="/baby-photos/placeholder-1.svg"
+            >
               <source src={media[0]} />
             </video>
           ) : (
@@ -328,7 +340,12 @@ export function Timeline() {
                     controls
                     autoPlay
                     playsInline
+                    webkit-playsinline="true"
+                    x5-playsinline="true"
+                    x5-video-player-type="h5"
+                    x5-video-player-fullscreen="false"
                     preload="metadata"
+                    poster="/baby-photos/placeholder-1.svg"
                     onCanPlay={() => setModalLoading(false)}
                   >
                     <source src={modal.media[modal.activeIndex]} />

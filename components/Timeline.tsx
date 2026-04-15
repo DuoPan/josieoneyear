@@ -28,6 +28,7 @@ const seventhMonthMedia: [string] = ["/baby-photos/7.1.mp4"];
 const eighthMonthMedia: [string] = ["/baby-photos/8.1.mp4"];
 const ninthMonthMedia: [string] = ["/baby-photos/9.1.mp4"];
 const tenthMonthMedia: [string] = ["/baby-photos/10.1.mp4"];
+const eleventhMonthMedia: [string] = ["/baby-photos/11.1.mp4"];
 
 const monthDescriptions = [
   "这是个摇晃的世界。。。",
@@ -40,7 +41,7 @@ const monthDescriptions = [
   "I人社交练习中。",
   "电量扩容，可以出门吃饭了。",
   "匍匐前进，向怀抱冲刺！",
-  "。",
+  "稳稳坐住，即兴弹奏",
   "。"
 ];
 
@@ -67,6 +68,8 @@ const items: TimelineItem[] = Array.from({ length: 12 }, (_, i) => {
                       ? ninthMonthMedia
                       : month === 10
                         ? tenthMonthMedia
+                        : month === 11
+                          ? eleventhMonthMedia
             : baseMedia;
   return {
     month,
@@ -123,7 +126,7 @@ function TimelinePhotoBloom({
   onPhotoClick: (photoIndex: number) => void;
 }) {
   return (
-    <div className="relative mx-auto h-60 w-full max-w-[22rem] md:h-64 md:w-64 md:max-w-none">
+    <div className="relative mx-auto h-56 w-full max-w-[18rem] md:h-60 md:w-56 md:max-w-none">
       {/* Blossom effect kept for future restore.
       <motion.div
         aria-hidden
@@ -137,7 +140,7 @@ function TimelinePhotoBloom({
       <div className="absolute inset-0 z-10 flex items-center justify-center">
         <button
           type="button"
-          className="relative h-52 w-[calc(100%-0.5rem)] appearance-none overflow-hidden rounded-2xl border-0 border-transparent bg-transparent p-0 shadow-none transition hover:scale-105 md:h-52 md:w-[calc(100%-0.5rem)]"
+          className="relative h-48 w-[calc(100%-0.5rem)] appearance-none overflow-hidden rounded-2xl border-0 border-transparent bg-slate-950 p-0 shadow-none transition hover:scale-105 md:h-52 md:w-[calc(100%-0.5rem)]"
           onClick={(event) => {
             event.stopPropagation();
             onPhotoClick(0);
@@ -146,7 +149,7 @@ function TimelinePhotoBloom({
         >
           {isVideoSrc(media[0]) ? (
             <video
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
               muted
               loop
               autoPlay
@@ -336,7 +339,7 @@ export function Timeline() {
                 ) : null}
                 {isVideoSrc(modal.media[modal.activeIndex]) ? (
                   <video
-                    className="h-full w-full object-cover"
+                    className="h-full w-full bg-slate-950 object-contain"
                     controls
                     autoPlay
                     playsInline

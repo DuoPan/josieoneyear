@@ -88,7 +88,7 @@ export function Hero() {
             </div>
           </div>
           <div className="mt-5 space-y-2 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
-            <p className="font-medium">时间：2026-05-10 12:00pm</p>
+            <p className="font-medium">时间：2026-05-03 12:00pm - 15:00pm</p>
             <p className="font-medium">地点：Josie家</p>
           </div>
         </motion.div>
